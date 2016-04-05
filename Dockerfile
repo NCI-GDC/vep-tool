@@ -51,4 +51,5 @@ ENV PATH ${PATH}:${HOME}/tools/ensembl-tools/scripts/variant_effect_predictor/
 # Set htslib path
 ENV PATH ${PATH}:${HOME}/tools/ensembl-tools/scripts/variant_effect_predictor/htslib/
 
+# Get the plugins
 WORKDIR ${HOME}
