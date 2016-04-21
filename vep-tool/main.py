@@ -42,7 +42,7 @@ class CWLMetricsTool(object):
 
     def get_time_metrics(self):
         time_str = None
-        with open(self.time_file, 'rU') as fh:
+        with open(self.time_file, 'rb') as fh:
             time_str = fh.read()
         return time_util.parse_time(time_str)
  
