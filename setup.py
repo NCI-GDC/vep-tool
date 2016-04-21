@@ -10,7 +10,7 @@ setuptools.setup(
         license = "Apache 2.0",
         packages = setuptools.find_packages(),
         install_requires = [
-            'SQLAlchemy',
+            'sqlalchemy',
             'psycopg2'
             ],
         classifiers = [

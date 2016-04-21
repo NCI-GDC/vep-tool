@@ -1,7 +1,5 @@
 FROM quay.io/jeremiahsavage/cdis_base
 
-ENV vep-tool 0.1
-
 USER root
 
 RUN apt-get update && apt-get install -y --force-yes \
@@ -23,6 +21,8 @@ RUN apt-get clean \
 USER ubuntu
 
 ENV HOME /home/ubuntu
+
+ENV vep-tool 0.1
 
 RUN mkdir -p ${HOME}/tools/
 WORKDIR ${HOME}/tools/
@@ -51,5 +51,16 @@ ENV PATH ${PATH}:${HOME}/tools/ensembl-tools/scripts/variant_effect_predictor/
 # Set htslib path
 ENV PATH ${PATH}:${HOME}/tools/ensembl-tools/scripts/variant_effect_predictor/htslib/
 
-# Get the plugins
+## Install tool
+WORKDIR ${HOME}
+RUN mkdir -p ${HOME}/tools/vep-tool
+ADD vep-tool ${HOME}/tools/vep-tool/
+ADD setup.* ${HOME}/tools/vep-tool/
+ADD requirements.txt ${HOME}/tools/vep-tool/
+
+RUN /bin/bash -c "source ${HOME}/.local/bin/virtualenvwrapper.sh \
+    && source ~/.virtualenvs/p3/bin/activate \
+    && cd ~/tools/vep-tool \
+    && pip install -r ./requirements.txt"
+
 WORKDIR ${HOME}
