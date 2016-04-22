@@ -53,8 +53,8 @@ ENV PATH ${PATH}:${HOME}/tools/ensembl-tools/scripts/variant_effect_predictor/ht
 
 # Add VEP plugins
 WORKDIR ${HOME}/tools/
-RUN mkdir -p ${HOME}/tools/vep-tool/
-ADD vep-plugins ${HOME}/tools/vep-tool/
+RUN mkdir -p ${HOME}/tools/vep-plugins/
+ADD vep-plugins ${HOME}/tools/vep-plugins/
 
 ## Install tool
 WORKDIR ${HOME}
