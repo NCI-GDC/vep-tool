@@ -32,13 +32,14 @@ class CustomToolTypeMixin(object):
 
 
 class CWLMetricsTool(object):
-    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id):
+    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine):
         self.time_file   = time_file
         self.normal_id   = normal_id
         self.tumor_id    = tumor_id
         self.input_uuid  = input_uuid
         self.output_uuid = output_uuid
         self.case_id     = case_id 
+        self.engine      = engine
 
     def get_time_metrics(self):
         time_str = None
@@ -55,8 +56,8 @@ class VEPMetricsTable(CustomToolTypeMixin, postgres.Base):
     __tablename__ = 'variant_effect_predictor_metrics'
 
 class VEPMetricsTool(CWLMetricsTool):
-    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id):
-        super(VEPMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id)
+    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine):
+        super(VEPMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine)
         self.tool  = 'variant_effect_predictor'
         self.files = [normal_id, tumor_id]
 
@@ -72,6 +73,8 @@ class VEPMetricsTool(CWLMetricsTool):
                                        elapsed           = time_metrics['wall_clock'],
                                        cpu               = time_metrics['percent_of_cpu'],
                                        max_resident_time = time_metrics['maximum_resident_set_size']) 
+        postgres.create_table(self.engine, metrics)
+        postgres.add_metrics(self.engine, metrics)
  
 def main():
     ## Set up parser
@@ -83,13 +86,36 @@ def main():
     parser.add_argument('--input_uuid', default="unknown", help='input file UUID')
     parser.add_argument('--output_uuid', default="unknown", help='output file UUID')
     parser.add_argument('--case_id', default="unknown", help='case ID')
+
+    # database parameters
+    db = parser.add_argument_group("Database parameters")
+    db.add_argument("--host", default='172.17.65.79', help='hostname for db')
+    db.add_argument("--database", default='prod_bioinfo', help='name of the database')
+    db.add_argument("--postgres_config", default=None, help="postgres config file", required=True)
+
     args = parser.parse_args()
+
+    # postgres
+    s = open(args.postgres_config, 'r').read()
+    postgres_config = eval(s)
+
+    DATABASE = {
+        'drivername': 'postgres',
+        'host' : args.host,
+        'port' : '5432',
+        'username': postgres_config['username'],
+        'password' : postgres_config['password'],
+        'database' : args.database
+    }
+
+    engine = postgres.db_connect(DATABASE)
 
     ## Load tool
     tool = None
     if args.tool == 'vep':
         tool = VEPMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
-                              args.input_uuid, args.output_uuid, args.case_id)
+                              args.input_uuid, args.output_uuid, args.case_id,
+                              engine)
 
     tool.add_metrics()
 
