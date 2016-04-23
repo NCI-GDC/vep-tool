@@ -4,6 +4,7 @@ USER root
 
 RUN apt-get update && apt-get install -y --force-yes \
     openjdk-8-jre-headless \
+    python-dev \
     libpq-dev \
     python-psycopg2 \
     libwww-perl \
