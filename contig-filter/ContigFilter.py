@@ -107,7 +107,7 @@ if __name__ == '__main__':
     # Parse VCF 
     total   = 0
     kept    = 0
-    with open(args.output_vcf, 'wb') as o:
+    with open(args.output_vcf, 'w') as o:
         for line in reader:
             # Header
             if line.startswith('#'): 

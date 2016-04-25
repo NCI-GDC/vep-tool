@@ -64,10 +64,13 @@ ADD vep-tool ${HOME}/tools/vep-tool/
 ADD setup.* ${HOME}/tools/vep-tool/
 ADD requirements.txt ${HOME}/tools/vep-tool/
 
+## Install contigfilter
+RUN mkdir -p ${HOME}/tools/vep-tool/contig-filter
+ADD contig-filter ${HOME}/tools/vep-tool/contig-filter
+
 RUN /bin/bash -c "source ${HOME}/.local/bin/virtualenvwrapper.sh \
     && source ~/.virtualenvs/p3/bin/activate \
     && cd ~/tools/vep-tool \
-    && pip install psycopg2 \
     && pip install -r ./requirements.txt"
 
 WORKDIR ${HOME}
