@@ -50,6 +50,32 @@ class CWLMetricsTool(object):
     def add_metrics(self):
         pass 
 
+## Contig Filter 
+class ContigFilterMetricsTable(CustomToolTypeMixin, postgres.Base):
+
+    __tablename__ = 'contig_filter_metrics'
+
+class ContigFilterMetricsTool(CWLMetricsTool):
+    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine):
+        super(VEPMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine)
+        self.tool  = 'contig_filter'
+        self.files = [normal_id, tumor_id]
+
+    def add_metrics(self):
+        time_metrics = self.get_time_metrics()
+        metrics      = ContigFilterMetricsTable(case_id  = self.case_id,
+                                       vcf_id            = self.output_uuid,
+                                       src_vcf_id        = self.input_uuid,
+                                       tool              = self.tool,
+                                       files             = self.files,
+                                       systime           = time_metrics['system_time'],
+                                       usertime          = time_metrics['user_time'],
+                                       elapsed           = time_metrics['wall_clock'],
+                                       cpu               = time_metrics['percent_of_cpu'],
+                                       max_resident_time = time_metrics['maximum_resident_set_size']) 
+        postgres.create_table(self.engine, metrics)
+        postgres.add_metrics(self.engine, metrics)
+
 ## VEP
 class VEPMetricsTable(CustomToolTypeMixin, postgres.Base):
 
@@ -79,7 +105,7 @@ class VEPMetricsTool(CWLMetricsTool):
 def main():
     ## Set up parser
     parser = argparse.ArgumentParser(description='Adding run metrics to GDC postgres for VEP workflow')
-    parser.add_argument('--tool', required=True, choices=['vep'], help='Which CWL tool used')
+    parser.add_argument('--tool', required=True, choices=['vep', 'contigfilter'], help='Which CWL tool used')
     parser.add_argument('--time_file', required=True, help='path to the output of time for this tool')
     parser.add_argument('--normal_id', default="unknown", help='normal sample unique identifier')
     parser.add_argument('--tumor_id', default="unknown", help='tumor sample unique identifier')
@@ -114,6 +140,11 @@ def main():
     tool = None
     if args.tool == 'vep':
         tool = VEPMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
+                              args.input_uuid, args.output_uuid, args.case_id,
+                              engine)
+
+    elif args.tool == 'contigfilter':
+        tool = ContigFilterMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
                               args.input_uuid, args.output_uuid, args.case_id,
                               engine)
 
