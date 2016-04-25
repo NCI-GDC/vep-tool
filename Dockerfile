@@ -67,6 +67,7 @@ ADD requirements.txt ${HOME}/tools/vep-tool/
 RUN /bin/bash -c "source ${HOME}/.local/bin/virtualenvwrapper.sh \
     && source ~/.virtualenvs/p3/bin/activate \
     && cd ~/tools/vep-tool \
+    && pip install psycopg2 \
     && pip install -r ./requirements.txt"
 
 WORKDIR ${HOME}
