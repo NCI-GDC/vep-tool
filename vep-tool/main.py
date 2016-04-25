@@ -57,7 +57,7 @@ class ContigFilterMetricsTable(CustomToolTypeMixin, postgres.Base):
 
 class ContigFilterMetricsTool(CWLMetricsTool):
     def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine):
-        super(VEPMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine)
+        super(ContigFilterMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine)
         self.tool  = 'contig_filter'
         self.files = [normal_id, tumor_id]
 
