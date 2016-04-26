@@ -42,7 +42,7 @@ def write_custom_header(o, args):
     Writes the fileDate, reference, center, indivdual, and sample VCF header columns.
     '''
     fmt_str = '''##fileDate={fdate}
-###gdcversion={version}
+##gdcversion={version}
 ##reference={ref}
 ##center="NCI Genomic Data Commons (GDC)"
 ##source={vcf_source}
