@@ -42,13 +42,14 @@ def write_custom_header(o, args):
     Writes the fileDate, reference, center, indivdual, and sample VCF header columns.
     '''
     fmt_str = '''##fileDate={fdate}
+###gdcversion={version}
 ##reference={ref}
 ##center="NCI Genomic Data Commons (GDC)"
 ##source={vcf_source}
 ##INDIVIDUAL=<NAME={patient_barcode},ID={case_id}>
 ##SAMPLE=<ID=NORMAL,NAME={normal_barcode},ALIQUOT_ID={normal_aliquot_uuid},BAM_ID={normal_bam_uuid}>
 ##SAMPLE=<ID=TUMOR,NAME={tumor_barcode},ALIQUOT_ID={tumor_aliquot_uuid},BAM_ID={tumor_bam_uuid}>
-'''.format(fdate=datetime.date.today(), ref=args.reference, vcf_source=args.vcf_source,
+'''.format(fdate=datetime.date.today(), version=args.gdc_version, ref=args.reference, vcf_source=args.vcf_source,
            patient_barcode=args.patient_barcode, case_id=args.case_id, 
            normal_barcode=args.normal_barcode, normal_aliquot_uuid=args.normal_aliquot_uuid, normal_bam_uuid=args.normal_bam_uuid,
            tumor_barcode=args.tumor_barcode, tumor_aliquot_uuid=args.tumor_aliquot_uuid, tumor_bam_uuid=args.tumor_bam_uuid)
@@ -96,6 +97,8 @@ if __name__ == '__main__':
         help='The assembly name to use in VCF header. [GRCh38.d1.vd1]') 
     parser.add_argument('--reference', required=False, default='GRCh38.d1.vd1.fa', 
         help='The reference fasta name to use in VCF header. [GRCh38.d1.vd1.fa]') 
+    parser.add_argument('--gdc_version', required=False, default='1.0', 
+        help='The GDC version to add in header [1.0]') 
     args = parser.parse_args()
 
     # Custom header 
