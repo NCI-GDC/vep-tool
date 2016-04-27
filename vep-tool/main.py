@@ -1,125 +1,18 @@
 #!/usr/bin/env python
 '''
-Main entry point for adding the runtime metrics from the annotation pipeline
-to the postgres db.
+Main entry point for adding the variant-annotation pipeline tools. 
 '''
 import argparse
-import logging
+import tools.contigfilter
+import tools.vcfreheader
 
-from sqlalchemy import Column, Integer, String, Float
-from sqlalchemy.dialects.postgresql import ARRAY
+def pg_metrics(args):
+    '''Main wrapper for adding metrics to PG db'''
+    from metrics.contigfilter import ContigFilterMetricsTool
+    from metrics.vep import VEPMetricsTool
+    from metrics.vcfreheader import VcfReheaderMetricsTool
 
-from cdis_pipe_utils import time_util
-from cdis_pipe_utils import postgres
-
-class CustomToolTypeMixin(object):
-    ''' Gather timing metrics with input/output uuids '''
-    id = Column(Integer, primary_key=True)
-    case_id = Column(String)
-    vcf_id = Column(String)
-    src_vcf_id = Column(String)
-    tool = Column(String)
-    files = Column(ARRAY(String))
-    systime = Column(Float)
-    usertime = Column(Float)
-    elapsed = Column(String)
-    cpu = Column(Float)
-    max_resident_time = Column(Float)
-
-    def __repr__(self):
-        return "<CustomToolTypeMixin(systime='%d', usertime='%d', elapsed='%s', cpu='%d', max_resident_time='%d'>" %(self.systime,
-                self.usertime, self.elapsed, self.cpu, self.max_resident_time)
-
-
-class CWLMetricsTool(object):
-    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine):
-        self.time_file   = time_file
-        self.normal_id   = normal_id
-        self.tumor_id    = tumor_id
-        self.input_uuid  = input_uuid
-        self.output_uuid = output_uuid
-        self.case_id     = case_id 
-        self.engine      = engine
-
-    def get_time_metrics(self):
-        time_str = None
-        with open(self.time_file, 'rb') as fh:
-            time_str = fh.read()
-        return time_util.parse_time(time_str)
- 
-    def add_metrics(self):
-        pass 
-
-## Contig Filter 
-class ContigFilterMetricsTable(CustomToolTypeMixin, postgres.Base):
-
-    __tablename__ = 'contig_filter_metrics'
-
-class ContigFilterMetricsTool(CWLMetricsTool):
-    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine):
-        super(ContigFilterMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine)
-        self.tool  = 'contig_filter'
-        self.files = [normal_id, tumor_id]
-
-    def add_metrics(self):
-        time_metrics = self.get_time_metrics()
-        metrics      = ContigFilterMetricsTable(case_id  = self.case_id,
-                                       vcf_id            = self.output_uuid,
-                                       src_vcf_id        = self.input_uuid,
-                                       tool              = self.tool,
-                                       files             = self.files,
-                                       systime           = time_metrics['system_time'],
-                                       usertime          = time_metrics['user_time'],
-                                       elapsed           = time_metrics['wall_clock'],
-                                       cpu               = time_metrics['percent_of_cpu'],
-                                       max_resident_time = time_metrics['maximum_resident_set_size']) 
-        postgres.create_table(self.engine, metrics)
-        postgres.add_metrics(self.engine, metrics)
-
-## VEP
-class VEPMetricsTable(CustomToolTypeMixin, postgres.Base):
-
-    __tablename__ = 'variant_effect_predictor_metrics'
-
-class VEPMetricsTool(CWLMetricsTool):
-    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine):
-        super(VEPMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine)
-        self.tool  = 'variant_effect_predictor'
-        self.files = [normal_id, tumor_id]
-
-    def add_metrics(self):
-        time_metrics = self.get_time_metrics()
-        metrics      = VEPMetricsTable(case_id           = self.case_id,
-                                       vcf_id            = self.output_uuid,
-                                       src_vcf_id        = self.input_uuid,
-                                       tool              = self.tool,
-                                       files             = self.files,
-                                       systime           = time_metrics['system_time'],
-                                       usertime          = time_metrics['user_time'],
-                                       elapsed           = time_metrics['wall_clock'],
-                                       cpu               = time_metrics['percent_of_cpu'],
-                                       max_resident_time = time_metrics['maximum_resident_set_size']) 
-        postgres.create_table(self.engine, metrics)
-        postgres.add_metrics(self.engine, metrics)
- 
-def main():
-    ## Set up parser
-    parser = argparse.ArgumentParser(description='Adding run metrics to GDC postgres for VEP workflow')
-    parser.add_argument('--tool', required=True, choices=['vep', 'contigfilter'], help='Which CWL tool used')
-    parser.add_argument('--time_file', required=True, help='path to the output of time for this tool')
-    parser.add_argument('--normal_id', default="unknown", help='normal sample unique identifier')
-    parser.add_argument('--tumor_id', default="unknown", help='tumor sample unique identifier')
-    parser.add_argument('--input_uuid', default="unknown", help='input file UUID')
-    parser.add_argument('--output_uuid', default="unknown", help='output file UUID')
-    parser.add_argument('--case_id', default="unknown", help='case ID')
-
-    # database parameters
-    db = parser.add_argument_group("Database parameters")
-    db.add_argument("--host", default='172.17.65.79', help='hostname for db')
-    db.add_argument("--database", default='prod_bioinfo', help='name of the database')
-    db.add_argument("--postgres_config", default=None, help="postgres config file", required=True)
-
-    args = parser.parse_args()
+    from cdis_pipe_utils import postgres
 
     # postgres
     s = open(args.postgres_config, 'r').read()
@@ -148,7 +41,75 @@ def main():
                               args.input_uuid, args.output_uuid, args.case_id,
                               engine)
 
+    elif args.tool == 'vcfreheader':
+        tool = VcfReheaderMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
+                              args.input_uuid, args.output_uuid, args.case_id,
+                              engine)
+
     tool.add_metrics()
+
+def main():
+    ## Set up parser
+    parser = argparse.ArgumentParser(description='Variant-Annotation-Pipeline Tools')
+
+    ## Sub parser
+    sp     = parser.add_subparsers(help='Choose the tool you want to run', dest='choice')
+
+    ## Postgres
+    p_pg   = sp.add_parser('postgres', help='Adding run metrics to GDC postgres for VEP workflow')
+    p_pg.add_argument('--tool', required=True, choices=['vep', 'contigfilter', 'vcfreheader'], help='Which CWL tool used')
+    p_pg.add_argument('--time_file', required=True, help='path to the output of time for this tool')
+    p_pg.add_argument('--normal_id', default="unknown", help='normal sample unique identifier')
+    p_pg.add_argument('--tumor_id', default="unknown", help='tumor sample unique identifier')
+    p_pg.add_argument('--input_uuid', default="unknown", help='input file UUID')
+    p_pg.add_argument('--output_uuid', default="unknown", help='output file UUID')
+    p_pg.add_argument('--case_id', default="unknown", help='case ID')
+
+    # database parameters
+    p_pg_db = p_pg.add_argument_group("Database parameters")
+    p_pg_db.add_argument("--host", default='172.17.65.79', help='hostname for db')
+    p_pg_db.add_argument("--database", default='prod_bioinfo', help='name of the database')
+    p_pg_db.add_argument("--postgres_config", default=None, help="postgres config file", required=True)
+
+    ## Contig Filter
+    p_cf    = sp.add_parser('contigfilter', help='Filter extra contigs')
+    p_cf.add_argument('--input_vcf', required=True, help='Input VCF file')
+    p_cf.add_argument('--output_vcf', required=True, help='Output VCF file. Automatically gzip if ends with ".gz"')
+    p_cf.add_argument('--fai', required=False,
+        help='The FAI file containing the contigs you want to keep. Default the fai file in the repository.')
+    p_cf.add_argument('--assembly', required=False, default='GRCh38.d1.vd1',
+        help='The assembly name to use in VCF header. [GRCh38.d1.vd1]')
+    p_cf.add_argument('--reference', required=False, default='GRCh38.d1.vd1.fa',
+        help='The reference fasta name to use in VCF header. [GRCh38.d1.vd1.fa]')
+
+    ## VCF Reheader 
+    p_cf    = sp.add_parser('vcfreheader', help='Format VCF header to GDC specs')
+    p_cf.add_argument('--input_vcf', required=True, help='Input VCF file')
+    p_cf.add_argument('--output_vcf', required=True, help='Output VCF file. Automatically gzip if ends with ".gz"')
+    p_cf.add_argument('--patient_barcode', required=True, help='Patient barcode')
+    p_cf.add_argument('--case_id', required=True, help='Case ID')
+    p_cf.add_argument('--tumor_barcode', required=True, help='Tumor barcode')
+    p_cf.add_argument('--tumor_aliquot_uuid', required=True, help='Tumor aliquot uuid')
+    p_cf.add_argument('--tumor_bam_uuid', required=True, help='Tumor BAM uuid')
+    p_cf.add_argument('--normal_barcode', required=True, help='Normal barcode')
+    p_cf.add_argument('--normal_aliquot_uuid', required=True, help='Normal aliquot uuid')
+    p_cf.add_argument('--normal_bam_uuid', required=True, help='Normal BAM uuid')
+    p_cf.add_argument('--caller_workflow_id', required=True, help='sets "ID" in gdcWorkflow header') 
+    p_cf.add_argument('--caller_workflow_name', required=True, help='sets "Name" in gdcWorkflow header') 
+    p_cf.add_argument('--caller_workflow_description', help='sets "Description" in gdcWorkflow header')
+    p_cf.add_argument('--caller_workflow_version', default='1.0', help='sets "Version" in gdcWorkflow header')
+    p_cf.add_argument('--annotation_workflow_id', required=True, help='sets "ID" in gdcWorkflow header') 
+    p_cf.add_argument('--annotation_workflow_name', required=True, help='sets "Name" in gdcWorkflow header') 
+    p_cf.add_argument('--annotation_workflow_description', help='sets "Description" in gdcWorkflow header')
+    p_cf.add_argument('--annotation_workflow_version', default='1.0', help='sets "Version" in gdcWorkflow header')
+
+    ## Parse args
+    args = parser.parse_args()
+
+    ## Run tools
+    if args.choice == 'postgres': pg_metrics(args)
+    elif args.choice == 'contigfilter': tools.contigfilter.run(args)
+    elif args.choice == 'vcfreheader': tools.vcfreheader.run(args)
 
 if __name__ == '__main__':
     main() 
