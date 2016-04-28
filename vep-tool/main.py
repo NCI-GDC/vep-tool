@@ -34,7 +34,7 @@ def pg_metrics(args):
     if args.tool == 'vep':
         tool = VEPMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
                               args.input_uuid, args.output_uuid, args.case_id,
-                              engine)
+                              engine, args.input_file)
 
     # Only if you want to add these tables
     #elif args.tool == 'contigfilter':
@@ -67,6 +67,7 @@ def main():
     p_pg.add_argument('--input_uuid', default="unknown", help='input file UUID')
     p_pg.add_argument('--output_uuid', default="unknown", help='output file UUID')
     p_pg.add_argument('--case_id', default="unknown", help='case ID')
+    p_pg.add_argument('--input_file', help='path to file for md5. required for vep')
 
     # database parameters
     p_pg_db = p_pg.add_argument_group("Database parameters")
