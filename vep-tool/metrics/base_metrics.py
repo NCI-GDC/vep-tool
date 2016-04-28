@@ -2,7 +2,6 @@
 Base classes for CWL metrics tool
 '''
 import hashlib
-import gzip
 
 from cdis_pipe_utils import time_util
 
@@ -49,9 +48,9 @@ class CWLMetricsMd5Tool(object):
 
     def get_gz_md5(self):
         hasher = hashlib.md5()
-        with gzip.open(self.input_file, 'rb') as afile:
-            buf = afile.read(BLOCKSIZE)
+        with open(self.input_file, 'rb') as afile:
+            buf = afile.read(self.BLOCKSIZE)
             while len(buf) > 0:
                 hasher.update(buf)
-                buf = afile.read(BLOCKSIZE)
+                buf = afile.read(self.BLOCKSIZE)
         return hasher.hexdigest()

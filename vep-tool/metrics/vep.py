@@ -4,7 +4,6 @@ Metrics table class for VEP
 from metrics.mixins import CustomToolMd5TypeMixin
 from metrics.base_metrics import CWLMetricsMd5Tool
 
-from utils.hash_md5 import get_gz_md5 
 from cdis_pipe_utils import postgres
 
 class VEPMetricsTable(CustomToolMd5TypeMixin, postgres.Base):
