@@ -8,11 +8,11 @@ import tools.vcfreheader
 
 def pg_metrics(args):
     '''Main wrapper for adding metrics to PG db'''
-    from metrics.contigfilter import ContigFilterMetricsTool
-    from metrics.vep import VEPMetricsTool
-    from metrics.vcfreheader import VcfReheaderMetricsTool
-
     from cdis_pipe_utils import postgres
+    from metrics.vep import VEPMetricsTool
+    # Only if you want to add these tables
+    #from metrics.contigfilter import ContigFilterMetricsTool
+    #from metrics.vcfreheader import VcfReheaderMetricsTool
 
     # postgres
     s = open(args.postgres_config, 'r').read()
@@ -36,15 +36,16 @@ def pg_metrics(args):
                               args.input_uuid, args.output_uuid, args.case_id,
                               engine)
 
-    elif args.tool == 'contigfilter':
-        tool = ContigFilterMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
-                              args.input_uuid, args.output_uuid, args.case_id,
-                              engine)
+    # Only if you want to add these tables
+    #elif args.tool == 'contigfilter':
+    #    tool = ContigFilterMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
+    #                          args.input_uuid, args.output_uuid, args.case_id,
+    #                          engine)
 
-    elif args.tool == 'vcfreheader':
-        tool = VcfReheaderMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
-                              args.input_uuid, args.output_uuid, args.case_id,
-                              engine)
+    #elif args.tool == 'vcfreheader':
+    #    tool = VcfReheaderMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
+    #                          args.input_uuid, args.output_uuid, args.case_id,
+    #                          engine)
 
     tool.add_metrics()
 
@@ -57,7 +58,9 @@ def main():
 
     ## Postgres
     p_pg   = sp.add_parser('postgres', help='Adding run metrics to GDC postgres for VEP workflow')
-    p_pg.add_argument('--tool', required=True, choices=['vep', 'contigfilter', 'vcfreheader'], help='Which CWL tool used')
+    # For now, only recording vep stats
+    #p_pg.add_argument('--tool', required=True, choices=['vep', 'contigfilter', 'vcfreheader'], help='Which CWL tool used')
+    p_pg.add_argument('--tool', required=True, choices=['vep'], help='Which CWL tool used')
     p_pg.add_argument('--time_file', required=True, help='path to the output of time for this tool')
     p_pg.add_argument('--normal_id', default="unknown", help='normal sample unique identifier')
     p_pg.add_argument('--tumor_id', default="unknown", help='tumor sample unique identifier')
