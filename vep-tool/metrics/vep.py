@@ -56,9 +56,11 @@ class VEPMetricsTool(CWLMetricsMd5Tool):
                     if section == '[General statistics]':
                         for row in data:
                             if row[0] == 'Variants remaining after filtering': 
-                                n_variants = int(row[1])
+                                try: n_variants = int(row[1])
+                                except: print('Unable to parse n_variants: {0}'.format(row[1])) 
                             elif row[0] == 'Novel / existing variants':
-                                n_novel = int(row[1].split(' ')[0])
+                                try: n_novel = int(row[1].split(' ')[0])
+                                except: print('Unable to parse n_novel: {0}'.format(row[1])) 
                     section = line.rstrip()
                     data = []
                 else:
