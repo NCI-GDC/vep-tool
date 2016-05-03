@@ -36,7 +36,7 @@ def pg_metrics(args):
         assert args.stats_file, 'VEP Requires --stats_file'
         tool = VEPMetricsTool(args.time_file, args.normal_id, args.tumor_id, 
                               args.input_uuid, args.output_uuid, args.case_id,
-                              engine, args.input_file, args.stats_file)
+                              engine, args.input_file, args.stats_file, args.hostname)
 
     # Only if you want to add these tables
     #elif args.tool == 'contigfilter':
@@ -71,6 +71,7 @@ def main():
     p_pg.add_argument('--case_id', default="unknown", help='case ID')
     p_pg.add_argument('--input_file', help='path to file for md5. required for vep')
     p_pg.add_argument('--stats_file', help='path to file for vep stats. required for vep')
+    p_pg.add_argument('--hostname', default='UNKNOWN', help='name of host where job is running')
 
     # database parameters
     p_pg_db = p_pg.add_argument_group("Database parameters")

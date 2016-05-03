@@ -6,7 +6,6 @@ from metrics.base_metrics import CWLMetricsMd5Tool
 
 from cdis_pipe_utils import postgres
 from sqlalchemy import Column, Integer, String
-import socket
 
 class VEPMetricsTable(CustomToolMd5TypeMixin, postgres.Base):
     hostname       = Column(String)
@@ -16,13 +15,13 @@ class VEPMetricsTable(CustomToolMd5TypeMixin, postgres.Base):
     __tablename__  = 'vep_metrics'
 
 class VEPMetricsTool(CWLMetricsMd5Tool):
-    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine, input_file, stats_file):
+    def __init__(self, time_file, normal_id, tumor_id, input_uuid, output_uuid, case_id, engine, input_file, stats_file, hostname):
         super(VEPMetricsTool,self).__init__(time_file, normal_id, tumor_id, input_uuid, output_uuid, 
                                             case_id, engine, input_file)
         self.tool       = 'vep'
         self.files      = [normal_id, tumor_id]
         self.stats_file = stats_file
-        self.hostname   = socket.gethostname()
+        self.hostname   = hostname 
 
     def add_metrics(self):
         time_metrics = self.get_time_metrics()
