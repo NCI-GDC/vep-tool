@@ -5,7 +5,7 @@ from metrics.mixins import CustomToolMd5TypeMixin
 from metrics.base_metrics import CWLMetricsMd5Tool
 
 from cdis_pipe_utils import postgres
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, String
 
 class VEPMetricsTable(CustomToolMd5TypeMixin, postgres.Base):
     hostname       = Column(String)
