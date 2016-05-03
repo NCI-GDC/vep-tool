@@ -23,7 +23,7 @@ USER ubuntu
 
 ENV HOME /home/ubuntu
 
-ENV vep-tool 0.1c
+ENV vep-tool 0.2
 
 RUN mkdir -p ${HOME}/tools/
 WORKDIR ${HOME}/tools/

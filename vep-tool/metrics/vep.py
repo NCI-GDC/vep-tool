@@ -8,6 +8,7 @@ from cdis_pipe_utils import postgres
 from sqlalchemy import Column, Integer
 
 class VEPMetricsTable(CustomToolMd5TypeMixin, postgres.Base):
+    hostname       = Column(String)
     total_variants = Column(Integer)
     novel_variants = Column(Integer)
 
@@ -20,6 +21,7 @@ class VEPMetricsTool(CWLMetricsMd5Tool):
         self.tool       = 'vep'
         self.files      = [normal_id, tumor_id]
         self.stats_file = stats_file
+        self.hostname   = socket.gethostname()
 
     def add_metrics(self):
         time_metrics = self.get_time_metrics()
@@ -36,6 +38,7 @@ class VEPMetricsTool(CWLMetricsMd5Tool):
                                        cpu               = time_metrics['percent_of_cpu'],
                                        max_resident_time = time_metrics['maximum_resident_set_size'],
                                        md5               = md5,
+                                       hostname          = self.hostname,
                                        total_variants    = nvar,
                                        novel_variants    = nnovel)
         postgres.create_table(self.engine, metrics)
