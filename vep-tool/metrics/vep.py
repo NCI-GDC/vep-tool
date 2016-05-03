@@ -6,6 +6,7 @@ from metrics.base_metrics import CWLMetricsMd5Tool
 
 from cdis_pipe_utils import postgres
 from sqlalchemy import Column, Integer, String
+import socket
 
 class VEPMetricsTable(CustomToolMd5TypeMixin, postgres.Base):
     hostname       = Column(String)
