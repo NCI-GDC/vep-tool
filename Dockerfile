@@ -6,6 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y update && apt-get install -y --for
         build-essential \
         libwww-perl \
         libclass-dbi-perl \
+        libarchive-extract-perl \
         libarchive-zip-perl \
         libjson-perl \
         libfile-copy-recursive-perl \
