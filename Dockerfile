@@ -4,6 +4,7 @@ MAINTAINER Kyle Hernandez
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y update && apt-get install -y --force-yes \
         build-essential \
+        libcgi-pm-perl \
         libwww-perl \
         libclass-dbi-perl \
         libarchive-extract-perl \
