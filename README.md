@@ -1,5 +1,4 @@
-GDC Base Template
+VEP Tool
 ---
 
-Base template repository for other GDC repositories. Included are the default
-license files and contribution instructions.
+Contains VEP plugins and utility scripts for running the VEP pipeline.
