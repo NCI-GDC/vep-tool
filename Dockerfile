@@ -14,6 +14,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y update && apt-get install -y --for
         wget \
         unzip \
         git \
+        zlib1g-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
