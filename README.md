@@ -1,7 +1,7 @@
 VEP Tool
 ---
 
-Contains VEP plugins and utility scripts for running the VEP pipeline.
+Contains VEP plugins, utility scripts, and a dockerfile for running the VEP pipeline.
 
 ## VEP Plugins
 
