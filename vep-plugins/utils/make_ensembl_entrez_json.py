@@ -86,7 +86,7 @@ def print_usage():
     print('''
 -------------------------------------------------------------------------------
 Converts the Gencode Entrez Gene IDs file:
-<ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_22/gencode.v22.metadata.EntrezGene.gz>
+<ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_22/gencode.v22.metadata.EntrezGene.gz>
 
 and the NCBI human gene info file:
 <ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz>
