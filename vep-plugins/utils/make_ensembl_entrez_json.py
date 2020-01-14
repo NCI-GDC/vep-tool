@@ -15,7 +15,7 @@ def load_gencode(fil):
     dic = {}
 
     try:
-        fh = open(fil)
+        fh = open(fil, 'rt')
     except Exception:
         print('ERROR!!', 'Unable to open input file', fil, file=sys.stderr)
     else:
@@ -23,9 +23,9 @@ def load_gencode(fil):
 
     # Open
     if fil.endswith('gz'):
-        fh = gzip.open(fil, 'rb')
+        fh = gzip.open(fil, 'rt')
     else:
-        fh = gzip.open(fil, 'rU')
+        fh = open(fil, 'rt')
 
     # Process
     for line in fh:
@@ -47,7 +47,7 @@ def load_ncbi(fil):
     dic = {}
 
     try:
-        fh = open(fil)
+        fh = open(fil, 'rt')
     except Exception:
         print('ERROR!!', 'Unable to open input file', fil, file=sys.stderr)
     else:
@@ -55,9 +55,9 @@ def load_ncbi(fil):
 
     # Open
     if fil.endswith('gz'):
-        fh = gzip.open(fil, 'rb')
+        fh = gzip.open(fil, 'rt')
     else:
-        fh = gzip.open(fil, 'rU')
+        fh = open(fil, 'rt')
 
     # Process
     head = []
@@ -119,5 +119,5 @@ if __name__ == '__main__':
     data['NCBI'] = load_ncbi(ncbi_fil)
 
     # Write
-    with open(ofil, 'wb') as o:
+    with open(ofil, 'wt') as o:
         json.dump(data, o)
