@@ -22,8 +22,8 @@ The `GDC_entrez.pm` plugin uses a pre-populated JSON file containing mappings fr
 Entrez identifiers. The JSON file can be created using the `vep-plugins/utils/make_ensembl_entrez_json.py`
 script. The required input files for generating the JSON are:
 
-* Gencode Entrez Gene IDs file: ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_22/gencode.v22.metadata.EntrezGene.gz
-* NCBI human gene info file: ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz
+* Gencode Entrez Gene IDs file: `ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_22/gencode.v22.metadata.EntrezGene.gz`
+* NCBI human gene info file: `ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz`
 
 __Note: The NCBI file is not versioned, so it may differ.__
 
