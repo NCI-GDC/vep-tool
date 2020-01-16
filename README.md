@@ -1,5 +1,5 @@
-GDC VEP Tool
----
+# GDC VEP Tool
+![Version badge](https://img.shields.io/badge/VEP-v84-<COLOR>.svg)
 
 Contains VEP plugins, utility scripts, and a dockerfile for running the VEP pipeline.
 See https://github.com/NCI-GDC/vep-cwl for more information about the GDC workflow
