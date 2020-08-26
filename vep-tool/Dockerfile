@@ -1,4 +1,4 @@
-FROM ubuntu:16.04 
+FROM quay.io/ncigdc/bio-u20:latest
 
 MAINTAINER Kyle Hernandez
 
@@ -46,7 +46,11 @@ ENV PATH ${PATH}:/opt/ensembl-tools/scripts/variant_effect_predictor/
 ENV PATH ${PATH}:/opt/ensembl-tools/scripts/variant_effect_predictor/htslib/
 
 # Add VEP plugins
-RUN mkdir -p /opt/vep-plugins/
-ADD vep-plugins /opt/vep-plugins/
+COPY vep-plugins /opt/vep-plugins/
 
 WORKDIR /opt 
+
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ['/tini', '--']
