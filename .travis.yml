@@ -3,6 +3,7 @@ services:
 install: make docker-login build
 stages:
 - name: publish
+  if: type != pull_request
 jobs:
   include:
   - stage: publish
