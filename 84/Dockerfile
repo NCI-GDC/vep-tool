@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM quay.io/ncigdc/bio-ubuntu:18.04
 
 MAINTAINER Kyle Hernandez
 
