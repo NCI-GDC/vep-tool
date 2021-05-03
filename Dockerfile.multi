@@ -1,0 +1,52 @@
+FROM quay.io/ncigdc/bio-ubuntu:20.04
+
+LABEL maintainer="sli6@uchicago.edu"
+
+ARG VERSION
+
+ENV URL=https://github.com/Ensembl/ensembl-vep/archive/refs/tags/release/${VERSION}.zip
+
+RUN apt-get -y update && apt-get install -y \
+        build-essential \
+        libcgi-pm-perl \
+        libwww-perl \
+        libclass-dbi-perl \
+        libarchive-extract-perl \
+        libarchive-zip-perl \
+        libjson-perl \
+        libfile-copy-recursive-perl \
+        libmodule-build-perl \
+        wget \
+        unzip \
+        git \
+        zlib1g-dev \
+        perl \
+        libbz2-dev \
+        liblzma-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN mkdir -p /opt/lib/ \
+    && cd /opt \
+    && wget https://github.com/bioperl/bioperl-live/archive/release-1-6-924.zip \
+    && unzip release-1-6-924.zip \
+    && mv /opt/bioperl-live-release-1-6-924/Bio /opt/lib/ \
+    && rm /opt/release-1-6-924.zip \
+    && rm -rf /opt/bioperl-live-release-1-6-924
+ENV PERL5LIB ${PERL5LIB}:/opt/lib/
+
+RUN cd /opt \
+    && wget $URL \
+    && unzip ${VERSION}.zip \
+    && rm ${VERSION}.zip \
+    && cd /opt/ensembl-vep-release-${VERSION} \
+    && perl INSTALL.pl --AUTO a --TEST \
+    && ln -s /opt/ensembl-vep-release-${VERSION}/vep /usr/local/bin/vep
+
+# Set htslib path
+ENV PATH ${PATH}:/opt/ensembl-vep-release-${VERSION}/htslib/
+
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--", "/usr/local/bin/vep"]

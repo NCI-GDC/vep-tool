@@ -1,4 +1,4 @@
-FROM ubuntu:16.04 
+FROM quay.io/ncigdc/bio-ubuntu:18.04
 
 MAINTAINER Kyle Hernandez
 
@@ -49,4 +49,4 @@ ENV PATH ${PATH}:/opt/ensembl-tools/scripts/variant_effect_predictor/htslib/
 RUN mkdir -p /opt/vep-plugins/
 ADD vep-plugins /opt/vep-plugins/
 
-WORKDIR /opt 
+WORKDIR /opt
