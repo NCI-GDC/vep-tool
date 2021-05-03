@@ -1,5 +1,5 @@
 VERSION = 102.0
-DOCKER_REPO = vep
+DOCKER_REPO = vep-tool
 
 SHORT_HASH := $(shell git rev-parse --short HEAD)
 DOCKER_URL := quay.io/ncigdc
@@ -35,7 +35,7 @@ build-docker:
 		-t "${DOCKER_IMAGE_HASH}"
 
 .PHONY: publish
-publish: docker-login
+publish:
 	docker push ${DOCKER_IMAGE}
 	docker push ${DOCKER_IMAGE_HASH}
 
