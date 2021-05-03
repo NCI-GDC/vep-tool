@@ -1,23 +1,14 @@
 services:
 - docker
-install: make build
+install: make docker-login build
 stages:
-- name: publish-release
-  if: branch = master AND type != pull_request
-- name: publish-staging
-  if: branch != master AND type != pull_request
+- name: publish
 jobs:
   include:
-  - stage: publish-staging
-    name: Publish staging image
+  - stage: publish
+    name: Publish image
     script:
-    - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
-    - make publish-staging
-  - stage: publish-release
-    name: Publish production image
-    script:
-    - docker login -u="$QUAY_USERNAME" -p="$QUAY_PASSWORD" quay.io
-    - make publish-release
+    - make docker-login publish
 env:
   global:
   - secure: jCic7NPIRKG054xdAXC3SZ9c1GewnHGPMb/8IXTWo+WcHK6OA+pqj1SHJm90V1tyJmG1KOxXGshN4vJcCtx1Mb0GL+lCI0gVRdbneN6TfMxvOzVhSnzSz9C3vRXRUUslFRscSZiTzrvqsiUbulLPWLa34tNz4l1vXxI6RzlRFzI3aAcCC0XFOj5YuBOrKSXJ/Wf5a/0R/WlIMKHAsCsqg1+/TLfIi+e0XQuuMJwQYMSwxUJZF6ZgxNZeKtkS+0THKO7N1XtxsWr0O9y60b689GevxVuB1dCXMKng9xvZSiHMLK4fxji2Ts6ZrHoI8Klo+kr0R51YfYx+gBqdMqVsTrMFccQEB2s4vFLQKXDNdZXzjSQ9P2y+RWgmpxrP5+/gz14MA9oLlt5YkfdKbpPylQ1ZNnV6tiOJT96qPiYVeEIS11xqFJ6eIntYFqXZ3O1dixZhO2ADRuCC5ZNLw4M7NPGVeegiYYtEheuolWIAo8aq6HuBlo1zjzFZeChrMSBfYoZiXXoSozeaJLJlK4z7Jj6XcQ+G4lu0b8cMYHTBlrwGa3BJMS6savp8ZOcDpNhO9VED6LeKwAD9bm86BNAgoKWKisYxdw7a0O7aEwMV5KKMQnS2kGWlPmNYxM5CoMvrE9aCjUMO0ZMbi7tznIp2LRXLgzKF66AYMyiSknaqFXc=
