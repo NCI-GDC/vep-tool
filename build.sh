@@ -3,7 +3,7 @@
 set -eo pipefail
 
 function build {
-	make -C $1 docker-login build
+	make -C $1 build
 }
 
 function publish {
