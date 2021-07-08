@@ -1,4 +1,4 @@
-VERSION = 102.0
+VERSION = 102
 DOCKER_REPO = vep-tool
 
 SHORT_HASH := $(shell git rev-parse --short HEAD)
