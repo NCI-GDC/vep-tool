@@ -29,7 +29,7 @@ build-docker:
 	@echo
 	@echo -- Building docker --
 	docker build . \
-		--file ../Dockerfile.multi \
+		--file ./Dockerfile \
 		--build-arg VERSION=${VERSION} \
 		-t "${DOCKER_IMAGE}" \
 		-t "${DOCKER_IMAGE_HASH}"
