@@ -1,37 +1,58 @@
-# GDC VEP Tool
-![Version badge](https://img.shields.io/badge/VEP-v84-<COLOR>.svg)
+Further documentation available [here](https://docs.google.com/document/d/17NFwGvn4vMEXZV9Qmg30BqAcKrdxBYCOB4pFdkkwIIo/edit#)
 
-Contains VEP plugins, utility scripts, and a dockerfile for running the VEP pipeline.
-See https://github.com/NCI-GDC/vep-cwl for more information about the GDC workflow
-associated with this.
+# Using this template
 
-## VEP Plugins
+This template repository should be used as the base for new Dockerized softare repositories.
 
-We have only tested these plugins on the software dependencies listed in the
-Dockerfile:
+# Software Dockers of multiple versions
 
-* BioPerl 1.6.924
-* VEP v84
+## Pre-requisites
 
-All of these plugins require tabix to be installed and in your `PATH` which is often
-installed automatically (via htslib) during the VEP installation process.
+- Docker
+- [just](https://github.com/casey/just)
 
-### Entrez
+`just init` will install the correct version of `pre-commit`, be sure to have a python3.8+ virtual environment active.
 
-The `GDC_entrez.pm` plugin uses a pre-populated JSON file containing mappings from GENCODE to
-Entrez identifiers. The JSON file can be created using the `vep-plugins/utils/make_ensembl_entrez_json.py`
-script. The required input files for generating the JSON are:
+- `just build <VERSION>` will create the Docker for the specified VERSION
 
-* Gencode Entrez Gene IDs file: `ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_22/gencode.v22.metadata.EntrezGene.gz`
-* NCBI human gene info file: `ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz`
+`just build-all` will build all available Docker images.
 
-__Note: The NCBI file is not versioned, so it may differ.__
+## Just
 
-VEP Usage: `--plugin GDC_entrez,<entrez_ensembl.json>`
+The `just` utility is a command runner replacement for `make`.
 
-### Evidence
+It has various improvements over `make` including the ability to list available command with `just -l`:
 
-The `GDC_evidence.pm` plugin uses the tabix-indexed VEP evidence VCF to add in the evidence values for dbSNP
-annotations.
+### Root Justfile
 
-VEP Usage: `--plugin GDC_evidence,<variation.vcf.gz>`
+```
+Available recipes:
+    build VERSION # Builds individual workflow
+    build-all      # Builds all docker images for each directory with a justfile
+    init
+```
+
+The root `justfile` provides recipes for Dockerizing workflows locally, while workflow-level `justfiles` provide recipes for building the workflow.
+
+### Workflow Justfile
+
+The version-level `justfile` requires the `DOCKERFILE` path be updated.
+
+```
+# justfile
+DOCKERFILE := "../Dockerfile.multi"
+```
+
+Many kinds of software are able to share a single Dockerfile with a parameterized version.
+
+However, if a particular version needs a bespoke Dockerfile, simply create on in the version directory and upate the justfile:
+
+```
+# justfile
+DOCKERFILE := "./Dockerfile"
+```
+
+```
+Available recipes:
+    emit-dockerfile          # Prints which Dockerfile to use for CI builds
+```
